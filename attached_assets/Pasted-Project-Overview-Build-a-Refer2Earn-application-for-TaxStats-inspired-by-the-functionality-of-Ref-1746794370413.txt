@@ -1,0 +1,129 @@
+Project Overview:
+
+Build a Refer2Earn application for TaxStats, inspired by the functionality of Referral Rock, to track and reward referrals made by users. The application will allow users (both candidates and recruiters) to generate unique referral links, track the success of their referrals, and earn rewards based on successful referrals.
+
+The core idea is to facilitate a seamless referral process, where the referring user gets rewarded when their referral signs up and engages with TaxStats. This system should include a backend to manage referrals, rewards, and a frontend interface for users to track their referral progress.
+
+Key Features:
+User Registration and Login:
+
+Users can sign up and log in using email and password authentication.
+
+Users should be able to sign up as Recruiters or Candidates, with different access levels.
+
+Referral Link Generation:
+
+Each user will be given a unique referral link.
+
+The referral link can be shared with others (via social media, email, etc.).
+
+Referral Tracking:
+
+Track the number of referrals generated through each unique referral link.
+
+Track the status of each referral (e.g., signed up, engaged, converted).
+
+Reward System:
+
+Referring users earn rewards based on successful actions (e.g., signing up and completing specific tasks).
+
+Rewards can be monetary or in the form of credits, discounts, etc.
+
+Implement a reward dashboard where users can see their earned rewards.
+
+Referral History and Analytics:
+
+Users should be able to see their referral history and status.
+
+Provide analytics on their referral performance (e.g., total referrals, total rewards, conversion rates).
+
+Admin Dashboard:
+
+Admins can view all referrals made across the platform.
+
+Admins can approve/reject rewards, track referral campaigns, and run promotions.
+
+Implement filters to sort referrals by user, status, and date.
+
+Email Notifications:
+
+Send email notifications to users when:
+
+Their referral link has been used.
+
+They have earned a reward.
+
+The referral's status has changed (e.g., successful conversion).
+
+Campaign Management (Optional):
+
+Admins can create time-bound referral campaigns with specific rules (e.g., earn extra rewards during a promotional period).
+
+Technologies:
+Frontend: Use React.js (or similar) for the user interface.
+
+Create separate pages for Dashboard, Referral History, Rewards, Admin Dashboard.
+
+Backend: Node.js or Python (Flask/Django) for API management and referral tracking.
+
+Implement API endpoints to manage user data, referrals, and rewards.
+
+Database: Firebase (Firestore) or PostgreSQL for storing user data, referrals, and rewards.
+
+Use Firestore for scalability and easy integration with Firebase Authentication.
+
+Authentication: Firebase Authentication (email/password sign-up/login).
+
+Rewards Calculation: Use simple formulas to calculate rewards based on successful referrals and specific actions.
+
+Email Service: Use SendGrid or Mailgun for sending email notifications.
+
+Steps for Replit Agent:
+Set up Firebase project:
+
+Create a Firebase project and configure Firebase Authentication, Firestore Database, and Firebase Storage (if needed for storing media or other files).
+
+User Authentication:
+
+Implement Firebase Authentication for user sign-up and login.
+
+Separate users into Candidates and Recruiters.
+
+Referral Link Generation:
+
+Create a system where users can generate and share a unique referral link (using Firebase Functions or the backend API).
+
+Referral Tracking and Analytics:
+
+Store referral data in Firestore (or your chosen database), and track each referral’s progress.
+
+Use backend logic to calculate the success of each referral (sign-up, engagement, etc.).
+
+Reward Management:
+
+Create a system to calculate and update rewards based on the referral success (monetary, credits, etc.).
+
+Create a dashboard to show users their referral earnings and history.
+
+Admin Dashboard:
+
+Create an admin interface to manage referrals and approve rewards.
+
+Implement filtering and search functionalities to view referral data by user, status, and date.
+
+Email Notifications:
+
+Set up email notification logic (via Firebase Functions or backend logic) to notify users when their referral has completed a milestone.
+
+Testing and Deployment:
+
+Ensure all features work smoothly and deploy the application on Firebase Hosting or a preferred platform.
+
+Additional Features (Optional):
+
+Referrals via QR Codes: Users can generate a QR code for easy sharing of their referral link.
+
+Referral Milestones: Reward users with badges or special incentives for hitting certain referral milestones (e.g., 5, 10, 50 referrals).
+
+Leaderboard: Display top referrers in a leaderboard to encourage more engagement.
+
