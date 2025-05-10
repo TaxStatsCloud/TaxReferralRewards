@@ -44,11 +44,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
             {/* Logo */}
             <div className="flex items-center flex-shrink-0 px-4 mb-5">
               <div className="flex items-center">
-                <div className="bg-primary rounded-lg p-2 mr-2">
+                <div className="bg-teal-500 rounded-lg p-2 mr-2">
                   <i className="fas fa-chart-line text-white"></i>
                 </div>
-                <span className="text-xl font-semibold">TaxStats</span>
-                <span className="ml-1 text-xs text-primary font-semibold py-0.5 px-1.5 rounded-md bg-blue-50">Refer2Earn</span>
+                <span className="text-xl font-semibold">ReferMint</span>
               </div>
             </div>
             

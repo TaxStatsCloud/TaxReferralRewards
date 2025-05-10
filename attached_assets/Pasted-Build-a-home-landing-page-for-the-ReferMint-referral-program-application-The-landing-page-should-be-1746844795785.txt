@@ -1,0 +1,102 @@
+Build a home/landing page for the ReferMint referral program application. The landing page should be engaging, easy to navigate, and optimized for conversions (e.g., signups, referrals). The page must highlight the value of the app, explain how it works, and encourage visitors to get started with the referral program.
+
+Key Features for the Landing Page:
+Hero Section (Above the Fold):
+
+A strong headline like:
+"Earn Rewards by Sharing Your Referral Link with ReferMint!"
+
+A short subheading describing the value proposition, e.g., "Invite friends, family, or colleagues and earn exciting rewards when they sign up and engage with TaxStats."
+
+Call to Action (CTA) button: "Start Referring Now" that leads to the signup page or referral dashboard.
+
+How It Works Section:
+
+A clear, simple explanation of the referral process. Use icons or images to break down the steps:
+
+Sign Up – Create an account with ReferMint.
+
+Share Your Link – Share your unique referral link with others.
+
+Earn Rewards – Get rewarded when your referrals sign up and complete certain actions.
+
+Each step should have a short description and a visual representation (e.g., icon or illustration).
+
+Benefits Section:
+
+Highlight the main benefits of joining ReferMint, such as:
+
+Simple Setup: Get started in minutes.
+
+Track Your Referrals: View real-time data on how many people you’ve referred.
+
+Earn Rewards: Get monetary or credit-based rewards for successful referrals.
+
+Use bullet points or icons for easy scanning.
+
+Testimonials or Success Stories (Optional):
+
+Include quotes or stories from happy users who have earned rewards using the app.
+
+Provide a real-life example of someone who benefited from the referral program.
+
+Pricing or Reward Structure (Optional):
+
+If applicable, provide details on how the rewards are structured, such as flat-rate rewards or tiered bonuses for multiple referrals.
+
+Mention any promotions or limited-time offers.
+
+Signup CTA:
+
+Another call-to-action button for users to sign up and start referring.
+
+The button should be placed in multiple locations, particularly after the "How It Works" section and the "Benefits" section.
+
+Footer:
+
+Links to the following:
+
+About: A brief description of ReferMint and TaxStats.
+
+Privacy Policy: Link to the privacy policy regarding data protection and usage.
+
+Terms of Service: Legal terms for using the app.
+
+Contact: Information or a contact form for support inquiries.
+
+Design and Style Requirements:
+Colors: Use a modern and clean palette with teal, white, and dark accents to match the ReferMint branding.
+
+Typography: Use clear, easy-to-read fonts with varying weights for emphasis. Include a bold headline font for key messages.
+
+Responsiveness: Ensure the landing page is fully responsive and optimized for mobile and desktop views.
+
+Images: Use relevant stock images or illustrations for the "How It Works" and "Benefits" sections to engage users visually.
+
+User Flow: The page should flow naturally from introduction to call-to-action, with each section building the case for users to start referring.
+
+Technology Stack:
+Frontend: HTML, CSS, and JavaScript (React.js or Vanilla JS).
+
+Hosting: Firebase Hosting or any preferred platform (Replit for development/testing).
+
+Analytics: Integrate Google Analytics to track conversions and user behavior on the page.
+
+Forms: Use Firebase or Formspree to handle form submissions for the "Contact" section.
+
+Steps for Replit Agent:
+Set up the layout using HTML/CSS, with proper sections for the hero area, how it works, benefits, testimonials, and footer.
+
+Style the page to match the ReferMint brand (colors, fonts, etc.).
+
+Integrate CTA buttons that guide users to the next step (sign-up page or dashboard).
+
+Include simple animations or hover effects to make the page interactive and engaging.
+
+Add form functionality for user sign-up or inquiries, either linking to Firebase or a third-party service.
+
+Ensure the page is mobile-responsive and optimized for both desktop and mobile devices.
+
+Outcome:
+The landing page should act as the primary marketing tool for ReferMint, providing visitors with a clear understanding of the app's value, encouraging them to sign up, and facilitating the referral process. The design should be modern, clean, and optimized for user engagement.
+
