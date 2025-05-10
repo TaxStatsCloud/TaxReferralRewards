@@ -6,6 +6,8 @@ import {
   notifications, type Notification, type InsertNotification
 } from "@shared/schema";
 import { v4 as uuidv4 } from 'uuid';
+import { db } from "./db";
+import { eq, and, lte, gte, isNull, desc, or } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -47,127 +49,66 @@ export interface IStorage {
   markAllNotificationsAsRead(userId: number): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private referrals: Map<number, Referral>;
-  private rewards: Map<number, Reward>;
-  private campaigns: Map<number, Campaign>;
-  private notifications: Map<number, Notification>;
-  
-  private userIdCounter: number;
-  private referralIdCounter: number;
-  private rewardIdCounter: number;
-  private campaignIdCounter: number;
-  private notificationIdCounter: number;
-
-  constructor() {
-    this.users = new Map();
-    this.referrals = new Map();
-    this.rewards = new Map();
-    this.campaigns = new Map();
-    this.notifications = new Map();
-    
-    this.userIdCounter = 1;
-    this.referralIdCounter = 1;
-    this.rewardIdCounter = 1;
-    this.campaignIdCounter = 1;
-    this.notificationIdCounter = 1;
-    
-    // Add default admin user
-    this.createUser({
-      uid: "admin123",
-      username: "admin",
-      email: "admin@taxstats.com",
-      password: "adminpassword", // Should be hashed in a real app
-      displayName: "Admin User",
-      role: "recruiter",
-      isAdmin: true,
-      referralCode: "ADMIN123"
-    });
-  }
-
+export class DatabaseStorage implements IStorage {
   // User operations
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const results = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return results[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const results = await db.select().from(users).where(eq(users.username, username)).limit(1);
+    return results[0];
   }
   
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.email === email,
-    );
+    const results = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return results[0];
   }
   
   async getUserByUid(uid: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.uid === uid,
-    );
+    const results = await db.select().from(users).where(eq(users.uid, uid)).limit(1);
+    return results[0];
   }
   
   async getUserByReferralCode(referralCode: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.referralCode === referralCode,
-    );
+    const results = await db.select().from(users).where(eq(users.referralCode, referralCode)).limit(1);
+    return results[0];
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userIdCounter++;
-    const now = new Date();
-    const user: User = { 
-      ...insertUser, 
-      id,
-      createdAt: now
-    };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
   
   async updateUser(id: number, data: Partial<User>): Promise<User | undefined> {
-    const user = await this.getUser(id);
-    if (!user) return undefined;
-    
-    const updatedUser = { ...user, ...data };
-    this.users.set(id, updatedUser);
+    const [updatedUser] = await db.update(users)
+      .set(data)
+      .where(eq(users.id, id))
+      .returning();
     return updatedUser;
   }
   
   async listUsers(): Promise<User[]> {
-    return Array.from(this.users.values());
+    return await db.select().from(users);
   }
   
   // Referral operations
   async createReferral(insertReferral: InsertReferral): Promise<Referral> {
-    const id = this.referralIdCounter++;
-    const now = new Date();
-    const referral: Referral = {
-      ...insertReferral,
-      id,
-      createdAt: now,
-      convertedAt: null
-    };
-    this.referrals.set(id, referral);
+    const [referral] = await db.insert(referrals).values(insertReferral).returning();
     return referral;
   }
   
   async getReferral(id: number): Promise<Referral | undefined> {
-    return this.referrals.get(id);
+    const results = await db.select().from(referrals).where(eq(referrals.id, id)).limit(1);
+    return results[0];
   }
   
   async getReferralsByReferrerId(referrerId: number): Promise<Referral[]> {
-    return Array.from(this.referrals.values()).filter(
-      (referral) => referral.referrerId === referrerId,
-    );
+    return await db.select().from(referrals).where(eq(referrals.referrerId, referrerId));
   }
   
   async updateReferralStatus(id: number, status: string, refereeId?: number): Promise<Referral | undefined> {
-    const referral = await this.getReferral(id);
-    if (!referral) return undefined;
-    
     const updates: Partial<Referral> = { status };
     
     if (status === 'converted') {
@@ -178,44 +119,34 @@ export class MemStorage implements IStorage {
       updates.refereeId = refereeId;
     }
     
-    const updatedReferral = { ...referral, ...updates };
-    this.referrals.set(id, updatedReferral);
+    const [updatedReferral] = await db.update(referrals)
+      .set(updates)
+      .where(eq(referrals.id, id))
+      .returning();
+    
     return updatedReferral;
   }
   
   async listReferrals(): Promise<Referral[]> {
-    return Array.from(this.referrals.values());
+    return await db.select().from(referrals);
   }
   
   // Reward operations
   async createReward(insertReward: InsertReward): Promise<Reward> {
-    const id = this.rewardIdCounter++;
-    const now = new Date();
-    const reward: Reward = {
-      ...insertReward,
-      id,
-      createdAt: now,
-      approvedAt: null,
-      paidAt: null
-    };
-    this.rewards.set(id, reward);
+    const [reward] = await db.insert(rewards).values(insertReward).returning();
     return reward;
   }
   
   async getReward(id: number): Promise<Reward | undefined> {
-    return this.rewards.get(id);
+    const results = await db.select().from(rewards).where(eq(rewards.id, id)).limit(1);
+    return results[0];
   }
   
   async getRewardsByUserId(userId: number): Promise<Reward[]> {
-    return Array.from(this.rewards.values()).filter(
-      (reward) => reward.userId === userId,
-    );
+    return await db.select().from(rewards).where(eq(rewards.userId, userId));
   }
   
   async updateRewardStatus(id: number, status: string): Promise<Reward | undefined> {
-    const reward = await this.getReward(id);
-    if (!reward) return undefined;
-    
     const updates: Partial<Reward> = { status };
     
     if (status === 'approved') {
@@ -224,91 +155,110 @@ export class MemStorage implements IStorage {
       updates.paidAt = new Date();
     }
     
-    const updatedReward = { ...reward, ...updates };
-    this.rewards.set(id, updatedReward);
+    const [updatedReward] = await db.update(rewards)
+      .set(updates)
+      .where(eq(rewards.id, id))
+      .returning();
+    
     return updatedReward;
   }
   
   async listRewards(): Promise<Reward[]> {
-    return Array.from(this.rewards.values());
+    return await db.select().from(rewards);
   }
   
   // Campaign operations
   async createCampaign(insertCampaign: InsertCampaign): Promise<Campaign> {
-    const id = this.campaignIdCounter++;
-    const now = new Date();
-    const campaign: Campaign = {
-      ...insertCampaign,
-      id,
-      createdAt: now
-    };
-    this.campaigns.set(id, campaign);
+    const [campaign] = await db.insert(campaigns).values(insertCampaign).returning();
     return campaign;
   }
   
   async getCampaign(id: number): Promise<Campaign | undefined> {
-    return this.campaigns.get(id);
+    const results = await db.select().from(campaigns).where(eq(campaigns.id, id)).limit(1);
+    return results[0];
   }
   
   async updateCampaign(id: number, data: Partial<Campaign>): Promise<Campaign | undefined> {
-    const campaign = await this.getCampaign(id);
-    if (!campaign) return undefined;
+    const [updatedCampaign] = await db.update(campaigns)
+      .set(data)
+      .where(eq(campaigns.id, id))
+      .returning();
     
-    const updatedCampaign = { ...campaign, ...data };
-    this.campaigns.set(id, updatedCampaign);
     return updatedCampaign;
   }
   
   async listActiveCampaigns(): Promise<Campaign[]> {
     const now = new Date();
-    return Array.from(this.campaigns.values()).filter(
-      (campaign) => campaign.isActive && 
-                     campaign.startDate <= now && 
-                     (!campaign.endDate || campaign.endDate >= now)
+    return await db.select().from(campaigns).where(
+      and(
+        eq(campaigns.isActive, true),
+        lte(campaigns.startDate, now),
+        or(
+          isNull(campaigns.endDate),
+          gte(campaigns.endDate, now)
+        )
+      )
     );
   }
   
   async listCampaigns(): Promise<Campaign[]> {
-    return Array.from(this.campaigns.values());
+    return await db.select().from(campaigns);
   }
   
   // Notification operations
   async createNotification(insertNotification: InsertNotification): Promise<Notification> {
-    const id = this.notificationIdCounter++;
-    const now = new Date();
-    const notification: Notification = {
-      ...insertNotification,
-      id,
-      createdAt: now
-    };
-    this.notifications.set(id, notification);
+    const [notification] = await db.insert(notifications).values(insertNotification).returning();
     return notification;
   }
   
   async getNotificationsByUserId(userId: number): Promise<Notification[]> {
-    return Array.from(this.notifications.values())
-      .filter(notification => notification.userId === userId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return await db.select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt));
   }
   
   async markNotificationAsRead(id: number): Promise<Notification | undefined> {
-    const notification = this.notifications.get(id);
-    if (!notification) return undefined;
+    const [updatedNotification] = await db.update(notifications)
+      .set({ isRead: true })
+      .where(eq(notifications.id, id))
+      .returning();
     
-    const updatedNotification = { ...notification, isRead: true };
-    this.notifications.set(id, updatedNotification);
     return updatedNotification;
   }
   
   async markAllNotificationsAsRead(userId: number): Promise<void> {
-    const userNotifications = await this.getNotificationsByUserId(userId);
-    
-    for (const notification of userNotifications) {
-      if (!notification.isRead) {
-        await this.markNotificationAsRead(notification.id);
-      }
-    }
+    await db.update(notifications)
+      .set({ isRead: true })
+      .where(
+        and(
+          eq(notifications.userId, userId),
+          eq(notifications.isRead, false)
+        )
+      );
   }
 }
 
-export const storage = new MemStorage();
+// Initialize admin user in database if not exists
+async function initializeAdminUser() {
+  const adminUser = await db.select().from(users).where(eq(users.username, 'admin')).limit(1);
+  
+  if (adminUser.length === 0) {
+    await db.insert(users).values({
+      uid: "admin123",
+      username: "admin",
+      email: "admin@refermint.com",
+      password: "adminpassword", // Should be hashed in a real app
+      displayName: "Admin User",
+      role: "recruiter",
+      isAdmin: true,
+      referralCode: "ADMIN123"
+    });
+    console.log('Admin user created');
+  }
+}
+
+// Initialize the database with admin user
+initializeAdminUser().catch(console.error);
+
+export const storage = new DatabaseStorage();
