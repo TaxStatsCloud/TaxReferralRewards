@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, User, Share2, Gift, Clock, ChartBar } from "lucide-react";
+import { CheckCircle, User, Share2, Gift, Clock, ChartBar, Mail, Phone, Twitter, Facebook, Instagram, Linkedin, Leaf } from "lucide-react";
 
 const Landing: React.FC = () => {
   return (
@@ -11,7 +11,7 @@ const Landing: React.FC = () => {
       <nav className="px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <div className="flex items-center">
           <div className="bg-teal-500 rounded-lg p-2 mr-2">
-            <i className="fas fa-chart-line text-white"></i>
+            <Leaf className="h-5 w-5 text-white" />
           </div>
           <span className="text-xl font-semibold">ReferMint</span>
         </div>
@@ -237,7 +237,7 @@ const Landing: React.FC = () => {
             <div>
               <div className="flex items-center mb-4">
                 <div className="bg-teal-500 rounded-lg p-2 mr-2">
-                  <i className="fas fa-chart-line text-white"></i>
+                  <Leaf className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-xl font-semibold text-white">ReferMint</span>
               </div>
@@ -251,17 +251,17 @@ const Landing: React.FC = () => {
               <ul className="space-y-2">
                 <li>
                   <Link href="/">
-                    <a className="hover:text-white transition-colors">Home</a>
+                    <span className="hover:text-white transition-colors cursor-pointer">Home</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/login">
-                    <a className="hover:text-white transition-colors">Login</a>
+                    <span className="hover:text-white transition-colors cursor-pointer">Login</span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/register">
-                    <a className="hover:text-white transition-colors">Sign Up</a>
+                    <span className="hover:text-white transition-colors cursor-pointer">Sign Up</span>
                   </Link>
                 </li>
               </ul>
@@ -286,13 +286,13 @@ const Landing: React.FC = () => {
               <h3 className="text-lg font-medium text-white mb-4">Contact</h3>
               <ul className="space-y-2">
                 <li className="flex items-center">
-                  <i className="fas fa-envelope mr-2"></i>
+                  <Mail className="h-4 w-4 mr-2" />
                   <a href="mailto:support@refermint.com" className="hover:text-white transition-colors">
                     support@refermint.com
                   </a>
                 </li>
                 <li className="flex items-center">
-                  <i className="fas fa-phone mr-2"></i>
+                  <Phone className="h-4 w-4 mr-2" />
                   <span>(555) 123-4567</span>
                 </li>
               </ul>
@@ -305,16 +305,16 @@ const Landing: React.FC = () => {
             </p>
             <div className="flex space-x-4 mt-4 md:mt-0">
               <a href="#" className="text-slate-400 hover:text-white">
-                <i className="fab fa-twitter"></i>
+                <Twitter className="h-5 w-5" />
               </a>
               <a href="#" className="text-slate-400 hover:text-white">
-                <i className="fab fa-facebook"></i>
+                <Facebook className="h-5 w-5" />
               </a>
               <a href="#" className="text-slate-400 hover:text-white">
-                <i className="fab fa-instagram"></i>
+                <Instagram className="h-5 w-5" />
               </a>
               <a href="#" className="text-slate-400 hover:text-white">
-                <i className="fab fa-linkedin"></i>
+                <Linkedin className="h-5 w-5" />
               </a>
             </div>
           </div>
