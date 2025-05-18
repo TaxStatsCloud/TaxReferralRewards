@@ -13,7 +13,7 @@ const Landing: React.FC = () => {
           <div className="bg-teal-500 rounded-lg p-2 mr-2">
             <Leaf className="h-5 w-5 text-white" />
           </div>
-          <span className="text-xl font-semibold">ReferMint</span>
+          <span className="text-xl font-semibold">TaxStats Refer2Earn</span>
         </div>
         <div className="flex items-center space-x-4">
           <Link href="/login">
@@ -28,7 +28,7 @@ const Landing: React.FC = () => {
       {/* Hero Section */}
       <section className="py-12 md:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-600 mb-6">
-          Earn Rewards by Sharing Your Referral Link with ReferMint!
+          Earn Rewards by Sharing Your Referral Link with TaxStats Refer2Earn!
         </h1>
         <p className="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto mb-10">
           Invite friends, family, or colleagues and earn exciting rewards when they sign up and engage with our services.
@@ -57,7 +57,7 @@ const Landing: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Sign Up</h3>
               <p className="text-slate-600">
-                Create your account with ReferMint in just a few minutes to get started.
+                Create your account with TaxStats Refer2Earn in just a few minutes to get started.
               </p>
             </CardContent>
           </Card>
@@ -92,7 +92,7 @@ const Landing: React.FC = () => {
       <section className="py-16 bg-slate-100 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Benefits of ReferMint</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Benefits of TaxStats Refer2Earn</h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               Our referral program offers numerous advantages to help you maximize your earnings.
             </p>
@@ -163,7 +163,7 @@ const Landing: React.FC = () => {
           <Card className="bg-white border-0 shadow-sm">
             <CardContent className="p-6">
               <p className="text-slate-600 mb-4">
-                "I've earned over $500 in just two months by referring my colleagues to ReferMint. The tracking system makes it easy to see my progress."
+                "I've earned over $500 in just two months by referring my colleagues to TaxStats Refer2Earn. The tracking system makes it easy to see my progress."
               </p>
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-white">
@@ -239,7 +239,7 @@ const Landing: React.FC = () => {
                 <div className="bg-teal-500 rounded-lg p-2 mr-2">
                   <Leaf className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-xl font-semibold text-white">ReferMint</span>
+                <span className="text-xl font-semibold text-white">TaxStats Refer2Earn</span>
               </div>
               <p className="text-sm">
                 Turn your network into rewards with our easy-to-use referral program.
@@ -287,8 +287,8 @@ const Landing: React.FC = () => {
               <ul className="space-y-2">
                 <li className="flex items-center">
                   <Mail className="h-4 w-4 mr-2" />
-                  <a href="mailto:support@refermint.com" className="hover:text-white transition-colors">
-                    support@refermint.com
+                  <a href="mailto:support@taxstats.com" className="hover:text-white transition-colors">
+                    support@taxstats.com
                   </a>
                 </li>
                 <li className="flex items-center">
@@ -301,7 +301,7 @@ const Landing: React.FC = () => {
           
           <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm">
-              &copy; {new Date().getFullYear()} ReferMint. All rights reserved.
+              &copy; {new Date().getFullYear()} TaxStats Refer2Earn. All rights reserved.
             </p>
             <div className="flex space-x-4 mt-4 md:mt-0">
               <a href="#" className="text-slate-400 hover:text-white">

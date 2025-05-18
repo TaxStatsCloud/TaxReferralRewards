@@ -247,7 +247,7 @@ async function initializeAdminUser() {
     await db.insert(users).values({
       uid: "admin123",
       username: "admin",
-      email: "admin@refermint.com",
+      email: "admin@taxstats.com",
       password: "adminpassword", // Should be hashed in a real app
       displayName: "Admin User",
       role: "recruiter",
