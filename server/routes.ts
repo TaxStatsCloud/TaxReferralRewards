@@ -7,7 +7,8 @@ import {
   insertReferralSchema, 
   insertRewardSchema, 
   insertCampaignSchema, 
-  insertNotificationSchema 
+  insertNotificationSchema,
+  insertPaymentSchema
 } from "@shared/schema";
 import { v4 as uuidv4 } from 'uuid';
 import session from 'express-session';
@@ -15,8 +16,20 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import MemoryStore from 'memorystore';
 import { createHash } from 'crypto';
+import Stripe from 'stripe';
+import sgMail from '@sendgrid/mail';
 
 const SessionStore = MemoryStore(session);
+
+// Initialize Stripe
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2023-10-16' as any
+});
+
+// Initialize SendGrid
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 // Helper function to generate a random referral code
 function generateReferralCode(username: string): string {
@@ -31,6 +44,26 @@ function hashPassword(password: string): string {
 
 function verifyPassword(password: string, hash: string): boolean {
   return hashPassword(password) === hash;
+}
+
+// Email sending function
+async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+  try {
+    if (!process.env.SENDGRID_API_KEY) {
+      console.warn('SendGrid API key not configured');
+      return false;
+    }
+    await sgMail.send({
+      to,
+      from: 'noreply@taxstats.com',
+      subject,
+      html
+    });
+    return true;
+  } catch (error) {
+    console.error('Email sending error:', error);
+    return false;
+  }
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -568,6 +601,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
         pendingRewardsAmount,
         conversionRate: totalReferrals > 0 ? (successfulReferrals / totalReferrals) * 100 : 0
       });
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
+  // Payment Routes - Create Payment Intent for reward payout
+  app.post('/api/payments/create-intent', isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { rewardId, amount } = req.body;
+
+      if (!rewardId || !amount || amount <= 0) {
+        return res.status(400).json({ message: 'Invalid reward or amount' });
+      }
+
+      const reward = await storage.getReward(rewardId);
+      if (!reward || reward.userId !== user.id) {
+        return res.status(404).json({ message: 'Reward not found' });
+      }
+
+      // Create Stripe PaymentIntent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100),
+        currency: 'usd',
+        metadata: {
+          rewardId: String(rewardId),
+          userId: String(user.id)
+        }
+      });
+
+      // Create payment record in database
+      const payment = await storage.createPayment({
+        rewardId,
+        userId: user.id,
+        amount,
+        currency: 'usd',
+        stripePaymentIntentId: paymentIntent.id,
+        status: 'pending'
+      });
+
+      res.json({
+        paymentId: payment.id,
+        clientSecret: paymentIntent.client_secret
+      });
+    } catch (error) {
+      console.error('Payment intent error:', error);
+      res.status(500).json({ message: 'Failed to create payment intent' });
+    }
+  });
+
+  // Stripe Webhook for payment confirmations
+  app.post('/api/webhook/stripe', async (req, res) => {
+    try {
+      const event = req.body;
+
+      if (event.type === 'payment_intent.succeeded') {
+        const paymentIntent = event.data.object;
+        const payment = await storage.getPaymentByStripeId(paymentIntent.id);
+
+        if (payment) {
+          // Update payment status
+          await storage.updatePaymentStatus(payment.id, 'succeeded');
+
+          // Update reward status to paid
+          await storage.updateRewardStatus(payment.rewardId, 'paid');
+
+          // Get user for email notification
+          const user = await storage.getUser(payment.userId);
+          if (user) {
+            await sendEmail(
+              user.email,
+              'Reward Payment Processed',
+              `<h2>Payment Confirmed</h2><p>Your reward of $${payment.amount} has been successfully processed and will be transferred to your account.</p>`
+            );
+          }
+        }
+      }
+
+      res.json({ received: true });
+    } catch (error) {
+      console.error('Webhook error:', error);
+      res.status(400).json({ message: 'Webhook error' });
+    }
+  });
+
+  // Email notification routes
+  app.post('/api/email/send', isAuthenticated, async (req, res) => {
+    try {
+      const { to, subject, html } = req.body;
+
+      if (!to || !subject || !html) {
+        return res.status(400).json({ message: 'Missing email fields' });
+      }
+
+      const success = await sendEmail(to, subject, html);
+      if (success) {
+        res.json({ message: 'Email sent successfully' });
+      } else {
+        res.status(500).json({ message: 'Failed to send email' });
+      }
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' });
     }

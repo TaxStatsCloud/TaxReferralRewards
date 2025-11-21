@@ -3,7 +3,8 @@ import {
   referrals, type Referral, type InsertReferral,
   rewards, type Reward, type InsertReward,
   campaigns, type Campaign, type InsertCampaign,
-  notifications, type Notification, type InsertNotification
+  notifications, type Notification, type InsertNotification,
+  payments, type Payment, type InsertPayment
 } from "@shared/schema";
 import { v4 as uuidv4 } from 'uuid';
 import { db } from "./db";
@@ -47,6 +48,13 @@ export interface IStorage {
   getNotificationsByUserId(userId: number): Promise<Notification[]>;
   markNotificationAsRead(id: number): Promise<Notification | undefined>;
   markAllNotificationsAsRead(userId: number): Promise<void>;
+  
+  // Payment operations
+  createPayment(payment: InsertPayment): Promise<Payment>;
+  getPayment(id: number): Promise<Payment | undefined>;
+  getPaymentByStripeId(stripePaymentIntentId: string): Promise<Payment | undefined>;
+  updatePaymentStatus(id: number, status: string): Promise<Payment | undefined>;
+  getPaymentsByUserId(userId: number): Promise<Payment[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -237,6 +245,43 @@ export class DatabaseStorage implements IStorage {
         )
       );
   }
+  
+  // Payment operations
+  async createPayment(insertPayment: InsertPayment): Promise<Payment> {
+    const [payment] = await db.insert(payments).values(insertPayment).returning();
+    return payment;
+  }
+  
+  async getPayment(id: number): Promise<Payment | undefined> {
+    const results = await db.select().from(payments).where(eq(payments.id, id)).limit(1);
+    return results[0];
+  }
+  
+  async getPaymentByStripeId(stripePaymentIntentId: string): Promise<Payment | undefined> {
+    const results = await db.select().from(payments)
+      .where(eq(payments.stripePaymentIntentId, stripePaymentIntentId))
+      .limit(1);
+    return results[0];
+  }
+  
+  async updatePaymentStatus(id: number, status: string): Promise<Payment | undefined> {
+    const updates: Partial<Payment> = { status };
+    
+    if (status === 'succeeded') {
+      updates.processedAt = new Date();
+    }
+    
+    const [updatedPayment] = await db.update(payments)
+      .set(updates)
+      .where(eq(payments.id, id))
+      .returning();
+    
+    return updatedPayment;
+  }
+  
+  async getPaymentsByUserId(userId: number): Promise<Payment[]> {
+    return await db.select().from(payments).where(eq(payments.userId, userId));
+  }
 }
 
 // Initialize admin user in database if not exists
@@ -244,11 +289,13 @@ async function initializeAdminUser() {
   const adminUser = await db.select().from(users).where(eq(users.username, 'admin')).limit(1);
   
   if (adminUser.length === 0) {
+    const crypto = require('crypto');
+    const hashedPassword = crypto.createHash('sha256').update('adminpassword').digest('hex');
+    
     await db.insert(users).values({
-      uid: "admin123",
       username: "admin",
       email: "admin@taxstats.com",
-      password: "adminpassword", // Should be hashed in a real app
+      password: hashedPassword,
       displayName: "Admin User",
       role: "recruiter",
       isAdmin: true,
