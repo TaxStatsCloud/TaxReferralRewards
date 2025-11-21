@@ -55,7 +55,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
     }
     await sgMail.send({
       to,
-      from: 'noreply@taxstats.com',
+      from: 'support@taxstatsrefer2earn.com',
       subject,
       html
     });
