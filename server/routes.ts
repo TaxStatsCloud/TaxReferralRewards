@@ -14,6 +14,7 @@ import session from 'express-session';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import MemoryStore from 'memorystore';
+import { createHash } from 'crypto';
 
 const SessionStore = MemoryStore(session);
 
@@ -21,6 +22,15 @@ const SessionStore = MemoryStore(session);
 function generateReferralCode(username: string): string {
   const randomString = uuidv4().substring(0, 6);
   return `${username.substring(0, 4)}${randomString}`.toUpperCase();
+}
+
+// Password hashing helper functions
+function hashPassword(password: string): string {
+  return createHash('sha256').update(password).digest('hex');
+}
+
+function verifyPassword(password: string, hash: string): boolean {
+  return hashPassword(password) === hash;
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -50,7 +60,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return done(null, false, { message: 'Incorrect username' });
         }
         
-        if (user.password !== password) { // In a real app, use bcrypt to compare passwords
+        if (!verifyPassword(password, user.password)) {
           return done(null, false, { message: 'Incorrect password' });
         }
         
@@ -106,6 +116,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userData.referralCode) {
         userData.referralCode = generateReferralCode(userData.username);
       }
+      
+      // Hash the password before storing
+      userData.password = hashPassword(userData.password);
       
       // Create the user
       const user = await storage.createUser(userData);

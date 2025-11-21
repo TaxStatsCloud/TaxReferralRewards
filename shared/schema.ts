@@ -5,7 +5,7 @@ import { z } from "zod";
 // User Schema
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  uid: text("uid").notNull().unique(), // Firebase UID
+  uid: text("uid").unique(), // Firebase UID - optional for local auth
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
