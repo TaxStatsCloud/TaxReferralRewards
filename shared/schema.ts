@@ -36,9 +36,24 @@ export const rewards = pgTable("rewards", {
   referralId: integer("referral_id").references(() => referrals.id).notNull(),
   amount: doublePrecision("amount").notNull(),
   status: text("status").notNull().default("pending"), // 'pending', 'approved', 'rejected', 'paid'
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
   approvedAt: timestamp("approved_at"),
   paidAt: timestamp("paid_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Payment Schema
+export const payments = pgTable("payments", {
+  id: serial("id").primaryKey(),
+  rewardId: integer("reward_id").references(() => rewards.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  amount: doublePrecision("amount").notNull(),
+  currency: text("currency").notNull().default("usd"),
+  stripePaymentIntentId: text("stripe_payment_intent_id").notNull().unique(),
+  status: text("status").notNull().default("pending"), // 'pending', 'succeeded', 'failed', 'cancelled'
+  paymentMethod: text("payment_method"), // 'card', 'bank_transfer', etc
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  processedAt: timestamp("processed_at"),
 });
 
 // Campaign Schema
@@ -81,6 +96,13 @@ export const insertRewardSchema = createInsertSchema(rewards).omit({
   createdAt: true,
   approvedAt: true,
   paidAt: true,
+  stripePaymentIntentId: true,
+});
+
+export const insertPaymentSchema = createInsertSchema(payments).omit({
+  id: true,
+  createdAt: true,
+  processedAt: true,
 });
 
 export const insertCampaignSchema = createInsertSchema(campaigns).omit({
@@ -108,3 +130,6 @@ export type InsertCampaign = z.infer<typeof insertCampaignSchema>;
 
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
